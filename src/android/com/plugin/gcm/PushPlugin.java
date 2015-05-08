@@ -36,6 +36,7 @@ public class PushPlugin extends CordovaPlugin {
 	private static String gSenderID;
 	private static Bundle gCachedExtras = null;
 	private static boolean gForeground = false;
+	private static boolean gSkipRegister = false;
 
 	/**
 	 * Gets the application context from cordova's main activity.
@@ -73,14 +74,14 @@ public class PushPlugin extends CordovaPlugin {
 
 				gECB = (String) jo.get("ecb");
 				gSenderID = (String) jo.get("senderID");
+				gSkipRegister = jo.getBoolean("skipRegister");
 
-				Log.v(TAG, "execute: ECB=" + gECB + " senderID=" + gSenderID);
+				Log.d(TAG, "execute: ECB=" + gECB + " senderID=" + gSenderID);
 
 				context = getApplicationContext();
-
 				regid = getRegistrationId(getApplicationContext());
 
-				if (regid.isEmpty()) {
+				if (!gSkipRegister && regid.isEmpty()) {
 					new AsyncRegister().execute(callbackContext);
 				} else {
 					sendJavascript(new JSONObject().put("event", "registered").put("regid", regid));
